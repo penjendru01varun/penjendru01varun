@@ -111,6 +111,24 @@ fun_fact: "I turn caffeine into code ☕→💻"
 <br/>
 
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- 🤖 WHOBEE 3D ROBOT                                            -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+
+<div align="center">
+
+<img src="https://user-images.githubusercontent.com/74038190/221352989-518609ab-b4d1-459e-929f-a08cd2bd9b3c.gif" width="300" alt="Whobee 3D Robot" />
+
+<h3>🤖 Meet <b>Whobee</b> — My Interactive Coding Companion!</h3>
+
+<a href="https://penjendru01varun.github.io/penjendru01varun/chatbot.html">
+  <img src="https://img.shields.io/badge/💬_Chat_with_Chitti-AI_Assistant-FF00FF?style=for-the-badge&labelColor=0D1117" alt="Chat with Chitti" />
+</a>
+
+</div>
+
+<br/>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 <!-- 🎫 MAGICAL PROJECTS PORTFOLIO                                 -->
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 
@@ -265,6 +283,18 @@ fun_fact: "I turn caffeine into code ☕→💻"
 ## 💬 Today's Magical Quote
 
 <img src="https://quotes-github-readme.vercel.app/api?type=horizontal&theme=radical&border=true" alt="Random Dev Quote" />
+
+</div>
+
+<br/>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- 🔵 ANIMATED DOTS SEPARATOR                                    -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+
+<div align="center">
+
+<img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="900" alt="Animated dots separator" />
 
 </div>
 
