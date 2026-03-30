@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chitti — AI Assistant | Penjendru Varun</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0D1117;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      overflow: hidden;
+    }
+
+    /* Glowing background blobs */
+    .bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.15;
+      animation: floatBlob 6s ease-in-out infinite alternate;
+    }
+    .blob1 { width: 400px; height: 400px; background: #8A2BE2; top: -100px; left: -100px; }
+    .blob2 { width: 350px; height: 350px; background: #FF00FF; bottom: -80px; right: -80px; animation-delay: 2s; }
+    .blob3 { width: 250px; height: 250px; background: #00FFFF; top: 40%; left: 40%; animation-delay: 4s; }
+    @keyframes floatBlob {
+      from { transform: scale(1) translate(0, 0); }
+      to   { transform: scale(1.15) translate(30px, -30px); }
+    }
+
+    /* Hero section */
+    .hero {
+      position: relative; z-index: 1;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #FF00FF, #8A2BE2, #00FFFF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+    .hero p { color: #888; font-size: 1rem; margin-bottom: 2rem; }
+    .hero .dev-link { color: #FF00FF; text-decoration: none; font-weight: 600; }
+    .hero .dev-link:hover { text-decoration: underline; }
+
+    /* Floating chatbot button */
+    #chatBtn {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8A2BE2, #FF00FF);
+      border: none;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 0 25px rgba(138, 43, 226, 0.6);
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      animation: pulse 2s infinite;
+    }
+    #chatBtn:hover { transform: scale(1.1); box-shadow: 0 0 40px rgba(255, 0, 255, 0.7); }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(138,43,226,0.6); }
+      50%       { box-shadow: 0 0 40px rgba(255,0,255,0.8); }
+    }
+    #chatBtn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+    /* Notification dot */
+    .notif-dot {
+      position: fixed; bottom: 90px; right: 28px;
+      background: #FF00FF; color: white; border-radius: 50%;
+      width: 22px; height: 22px; font-size: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; z-index: 1001;
+      animation: bounce 1.5s infinite;
+    }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+    /* Chatbot window */
+    #chatWindow {
+      position: fixed;
+      bottom: 110px;
+      right: 28px;
+      width: 370px;
+      max-height: 560px;
+      background: rgba(13, 17, 23, 0.97);
+      border: 1px solid rgba(138, 43, 226, 0.4);
+      border-radius: 20px;
+      box-shadow: 0 0 60px rgba(138,43,226,0.3), 0 20px 60px rgba(0,0,0,0.5);
+      display: none;
+      flex-direction: column;
+      z-index: 999;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      animation: slideUp 0.3s ease;
+    }
+    #chatWindow.open { display: flex; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    /* Chat header */
+    .chat-header {
+      background: linear-gradient(135deg, #1a0533, #0D1117);
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(138,43,226,0.3);
+    }
+    .chat-header img {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 2px solid #FF00FF;
+      box-shadow: 0 0 12px rgba(255,0,255,0.5);
+    }
+    .chat-header-info h3 { font-size: 0.95rem; font-weight: 700; color: #FF00FF; }
+    .chat-header-info p  { font-size: 0.72rem; color: #00FFFF; }
+    .online-dot {
+      display: inline-block; width: 8px; height: 8px;
+      background: #00FF7F; border-radius: 50%;
+      box-shadow: 0 0 6px #00FF7F; margin-right: 4px;
+    }
+    .close-btn {
+      margin-left: auto; background: none; border: none;
+      color: #888; font-size: 1.2rem; cursor: pointer;
+      transition: color 0.2s;
+    }
+    .close-btn:hover { color: #FF00FF; }
+
+    /* Messages area */
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scrollbar-width: thin;
+      scrollbar-color: #8A2BE2 transparent;
+    }
+    #messages::-webkit-scrollbar { width: 4px; }
+    #messages::-webkit-scrollbar-thumb { background: #8A2BE2; border-radius: 2px; }
+
+    /* Message bubbles */
+    .msg {
+      max-width: 82%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      animation: msgIn 0.25s ease;
+    }
+    @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .msg.bot {
+      background: rgba(138,43,226,0.15);
+      border: 1px solid rgba(138,43,226,0.3);
+      color: #e0e0e0;
+      border-radius: 16px 16px 16px 4px;
+      align-self: flex-start;
+    }
+    .msg.user {
+      background: linear-gradient(135deg, #8A2BE2, #FF00FF);
+      color: white;
+      border-radius: 16px 16px 4px 16px;
+      align-self: flex-end;
+    }
+    .msg-row { display: flex; align-items: flex-end; gap: 8px; }
+    .msg-row.user { flex-direction: row-reverse; }
+    .msg-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1px solid #8A2BE2;
+      flex-shrink: 0;
+    }
+
+    /* Typing indicator */
+    .typing {
+      display: flex; align-items: center; gap: 5px;
+      padding: 10px 14px;
+      background: rgba(138,43,226,0.1);
+      border: 1px solid rgba(138,43,226,0.2);
+      border-radius: 16px 16px 16px 4px;
+      align-self: flex-start;
+    }
+    .typing span {
+      width: 7px; height: 7px;
+      background: #FF00FF; border-radius: 50%;
+      animation: typingDot 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingDot { 0%,80%,100% { transform: scale(0.7); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+
+    /* Quick suggestions */
+    .suggestions {
+      padding: 8px 12px;
+      display: flex; flex-wrap: wrap; gap: 6px;
+      border-top: 1px solid rgba(138,43,226,0.15);
+    }
+    .sug-btn {
+      background: rgba(138,43,226,0.1);
+      border: 1px solid rgba(138,43,226,0.3);
+      border-radius: 20px; padding: 5px 12px;
+      color: #d0aaff; font-size: 0.75rem; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .sug-btn:hover { background: rgba(255,0,255,0.2); border-color: #FF00FF; color: white; }
+
+    /* Input area */
+    .chat-input {
+      display: flex; gap: 8px; padding: 12px 14px;
+      border-top: 1px solid rgba(138,43,226,0.2);
+      background: rgba(255,255,255,0.02);
+    }
+    #msgInput {
+      flex: 1; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(138,43,226,0.3);
+      border-radius: 12px; padding: 10px 14px;
+      color: white; font-size: 0.85rem; outline: none;
+      transition: border-color 0.2s;
+    }
+    #msgInput:focus { border-color: #FF00FF; }
+    #msgInput::placeholder { color: #555; }
+    #sendBtn {
+      background: linear-gradient(135deg, #8A2BE2, #FF00FF);
+      border: none; border-radius: 12px;
+      width: 42px; height: 42px;
+      cursor: pointer; font-size: 1.1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    #sendBtn:hover { transform: scale(1.08); box-shadow: 0 0 15px rgba(255,0,255,0.4); }
+
+    /* Info cards in hero */
+    .info-cards {
+      display: flex; gap: 16px; justify-content: center;
+      flex-wrap: wrap; margin-top: 2rem;
+    }
+    .card {
+      background: rgba(138,43,226,0.08);
+      border: 1px solid rgba(138,43,226,0.25);
+      border-radius: 14px; padding: 18px 22px;
+      text-align: left; min-width: 180px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .card:hover { border-color: #FF00FF; transform: translateY(-4px); }
+    .card h4 { color: #FF00FF; font-size: 0.8rem; margin-bottom: 6px; }
+    .card p  { color: #aaa; font-size: 0.82rem; }
+    .card a  { color: #00FFFF; text-decoration: none; font-size: 0.8rem; }
+    .card a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<!-- Background blobs -->
+<div class="bg">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+</div>
+
+<!-- Hero -->
+<div class="hero">
+  <img src="https://user-images.githubusercontent.com/74038190/221352989-518609ab-b4d1-459e-929f-a08cd2bd9b3c.gif"
+       width="180" alt="Chitti Robot" style="border-radius:50%;border:3px solid #FF00FF;box-shadow:0 0 30px rgba(255,0,255,0.4);margin-bottom:1rem;" />
+  <h1>Hi, I'm Chitti! 🤖</h1>
+  <p>AI Assistant developed by <a class="dev-link" href="https://github.com/penjendru01varun" target="_blank">Penjendru Varun</a></p>
+  <p style="color:#555;font-size:0.85rem;">👉 Click the glowing button in the bottom right to chat with me!</p>
+
+  <div class="info-cards">
+    <div class="card">
+      <h4>👤 Developer</h4>
+      <p>Penjendru Varun</p>
+      <p>B.E CSE — Pre-Final Year</p>
+      <p>RMKCET</p>
+    </div>
+    <div class="card">
+      <h4>🌐 Links</h4>
+      <a href="https://github.com/penjendru01varun" target="_blank">GitHub Profile</a><br/>
+      <a href="https://www.linkedin.com/in/penjendruvarun/" target="_blank">LinkedIn</a>
+    </div>
+    <div class="card">
+      <h4>💼 Repos</h4>
+      <p>22 GitHub Repositories</p>
+      <p>Full Stack &amp; AI Projects</p>
+    </div>
+  </div>
+</div>
+
+<!-- Notification dot -->
+<div class="notif-dot">1</div>
+
+<!-- Floating bot button -->
+<button id="chatBtn" onclick="toggleChat()" title="Chat with Chitti">
+  <img src="https://user-images.githubusercontent.com/74038190/221352989-518609ab-b4d1-459e-929f-a08cd2bd9b3c.gif" alt="Chitti" />
+</button>
+
+<!-- Chat window -->
+<div id="chatWindow">
+  <div class="chat-header">
+    <img src="https://user-images.githubusercontent.com/74038190/221352989-518609ab-b4d1-459e-929f-a08cd2bd9b3c.gif" alt="Chitti" />
+    <div class="chat-header-info">
+      <h3>Chitti 🤖</h3>
+      <p><span class="online-dot"></span>Online • AI Assistant by Penjendru Varun</p>
+    </div>
+    <button class="close-btn" onclick="toggleChat()">✕</button>
+  </div>
+
+  <div id="messages"></div>
+
+  <!-- Quick suggestions -->
+  <div class="suggestions">
+    <button class="sug-btn" onclick="sendSuggestion('Who are you?')">Who are you?</button>
+    <button class="sug-btn" onclick="sendSuggestion('Tell me about Varun')">About Varun</button>
+    <button class="sug-btn" onclick="sendSuggestion('Show his projects')">Projects</button>
+    <button class="sug-btn" onclick="sendSuggestion('GitHub stats')">GitHub Stats</button>
+  </div>
+
+  <div class="chat-input">
+    <input id="msgInput" type="text" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter') sendMessage()" />
+    <button id="sendBtn" onclick="sendMessage()">➤</button>
+  </div>
+</div>
+
+<script>
+  // ─────────────────────────────────────────────
+  //  CHITTI KNOWLEDGE BASE
+  // ─────────────────────────────────────────────
+  const VARUN = {
+    name: "Penjendru Varun",
+    alias: "penjendru01varun",
+    degree: "B.E Computer Science & Engineering (CSE)",
+    college: "RMKCET (R.M.K College of Engineering and Technology)",
+    year: "Pre-Final Year (3rd Year)",
+    email: "penjendru01varun@gmail.com",
+    github: "https://github.com/penjendru01varun",
+    linkedin: "https://www.linkedin.com/in/penjendruvarun/",
+    repos: 22,
+    focus: "Full Stack Developer & AI/ML Enthusiast",
+    skills: ["JavaScript", "TypeScript", "Python", "React", "Next.js", "FastAPI", "Django", "MongoDB", "PostgreSQL", "Docker", "AWS"],
+    projects: [
+      { name: "CodeCasa", url: "https://github.com/penjendru01varun/codecasa", desc: "Main coding repository — all code experiments and practice projects in multiple languages.", tech: "Multi-language" },
+      { name: "Next Platform Starter", url: "https://github.com/penjendru01varun/next-platform-starter", desc: "A production-ready Next.js starter template with best practices, TypeScript, and modern tooling.", tech: "JavaScript / Next.js" },
+      { name: "EcoLearn AI", url: "https://github.com/penjendru01varun/ecolearn-ai", desc: "AI-powered environmental education platform built for a Hackathon. Teaches sustainability using AI.", tech: "TypeScript / AI" },
+      { name: "WeatherAI ChatBot", url: "https://github.com/penjendru01varun/WeatherAIchatBot", desc: "An intelligent weather assistant chatbot powered by AI. Gives weather info conversationally.", tech: "TypeScript" },
+      { name: "Vidhai", url: "https://github.com/penjendru01varun/Vidhai", desc: "A JavaScript-based video/media project.", tech: "JavaScript" },
+      { name: "RejectRefine", url: "https://github.com/penjendru01varun/RejectRefine", desc: "A Python tool for data refinement and cleaning workflows.", tech: "Python" },
+      { name: "Supervity AI", url: "https://github.com/penjendru01varun/supervity-ai", desc: "An AI supervision and monitoring tool built with TypeScript.", tech: "TypeScript / AI" },
+      { name: "Resume", url: "https://github.com/penjendru01varun/resume", desc: "Professional ATS-optimized resume built with HTML/CSS, designed for a single A4 page.", tech: "HTML / CSS" },
+      { name: "penjendru01varun (Profile)", url: "https://github.com/penjendru01varun/penjendru01varun", desc: "This magical animated GitHub profile README itself!", tech: "Markdown / GitHub Actions" },
+    ]
+  };
+
+  // ─────────────────────────────────────────────
+  //  RESPONSE LOGIC
+  // ─────────────────────────────────────────────
+  function getResponse(input) {
+    const q = input.toLowerCase().trim();
+
+    // Greetings
+    if (/\b(hi|hello|hey|howdy|greetings|sup|yo)\b/.test(q))
+      return "Hi there! 👋 How are you doing? I'm Chitti, your friendly AI assistant! I'm here to tell you all about <b>Penjendru Varun</b>. What would you like to know? 😊";
+
+    // Farewell
+    if (/\b(bye|goodbye|see you|later|take care|cya|farewell)\b/.test(q))
+      return "Goodbye! 👋 It was great chatting with you! Come back anytime. Have an amazing day! 🌟✨";
+
+    // How are you
+    if (/how are you|how r u|how do you do/.test(q))
+      return "I'm doing great, thank you for asking! 🤖✨ I'm always excited to talk about <b>Penjendru Varun</b> and his amazing projects! How can I help you? 😊";
+
+    // Name
+    if (/your name|what.*name|who.*you|name.*chitti/i.test(q))
+      return "My name is <b>Chitti</b> 🤖✨<br/>I was developed by <b>Penjendru Varun</b> — a passionate Full Stack Developer & AI Enthusiast from India! 💜";
+
+    // Developer
+    if (/who.*develop|who.*made|who.*created|who.*built|who.*made|developer|creator|author/i.test(q))
+      return "<b>Penjendru Varun</b> has developed me! 💜🤖<br/><br/>He is a <b>Full Stack Developer & AI/ML Enthusiast</b> currently studying B.E CSE at <b>RMKCET</b> in his Pre-Final year. He loves building awesome things with code! 🚀";
+
+    // Personal details
+    if (/personal|about (you|varun|him)|details|tell me|who is varun|information|profile/i.test(q))
+      return `Here are Penjendru Varun's details! 👤✨<br/><br/>
+        🧑 <b>Name:</b> Penjendru Varun<br/>
+        🎓 <b>Degree:</b> B.E Computer Science & Engineering<br/>
+        🏫 <b>College:</b> RMKCET<br/>
+        📅 <b>Year:</b> Pre-Final Year (3rd Year)<br/>
+        💼 <b>Role:</b> Full Stack Developer & AI Enthusiast<br/>
+        📧 <b>Email:</b> penjendru01varun@gmail.com<br/>
+        🔗 <b>GitHub:</b> <a href="${VARUN.github}" target="_blank">penjendru01varun</a><br/>
+        💼 <b>LinkedIn:</b> <a href="${VARUN.linkedin}" target="_blank">penjendruvarun</a>`;
+
+    // Projects list
+    if (/projects|repos|repositories|portfolio|work|github repo/i.test(q)) {
+      let list = "Here are Penjendru Varun's featured projects! 🚀✨<br/><br/>";
+      VARUN.projects.forEach((p, i) => {
+        list += `${i + 1}. <b><a href="${p.url}" target="_blank">${p.name}</a></b> — ${p.desc}<br/>   🛠️ ${p.tech}<br/><br/>`;
+      });
+      list += `<i>...and more! He has <b>${VARUN.repos} total repositories</b> on GitHub. 🌟</i>`;
+      return list;
+    }
+
+    // GitHub stats
+    if (/github stats|followers|following|stats|contribution/i.test(q))
+      return `📊 <b>Penjendru Varun's GitHub Stats:</b><br/><br/>
+        📁 <b>Total Repositories:</b> ${VARUN.repos}<br/>
+        ⭐ <b>Stars:</b> Check on <a href="${VARUN.github}" target="_blank">GitHub</a><br/>
+        👥 <b>Followers/Following:</b> Check on <a href="${VARUN.github}" target="_blank">GitHub Profile</a><br/>
+        💻 <b>Focus:</b> ${VARUN.focus}<br/><br/>
+        Visit → <a href="${VARUN.github}" target="_blank">github.com/penjendru01varun</a> 🚀`;
+
+    // Specific projects
+    if (/codecasa|code casa/i.test(q))
+      return `🏠 <b>CodeCasa</b><br/>${VARUN.projects[0].desc}<br/>🛠️ Tech: ${VARUN.projects[0].tech}<br/>🔗 <a href="${VARUN.projects[0].url}" target="_blank">View on GitHub</a>`;
+
+    if (/next platform|next starter|nextjs starter/i.test(q))
+      return `🚀 <b>Next Platform Starter</b><br/>${VARUN.projects[1].desc}<br/>🛠️ Tech: ${VARUN.projects[1].tech}<br/>🔗 <a href="${VARUN.projects[1].url}" target="_blank">View on GitHub</a>`;
+
+    if (/ecolearn|eco learn|hackathon/i.test(q))
+      return `🌱 <b>EcoLearn AI</b><br/>${VARUN.projects[2].desc}<br/>🛠️ Tech: ${VARUN.projects[2].tech}<br/>🔗 <a href="${VARUN.projects[2].url}" target="_blank">View on GitHub</a>`;
+
+    if (/weather|weatherai/i.test(q))
+      return `🌤️ <b>WeatherAI ChatBot</b><br/>${VARUN.projects[3].desc}<br/>🛠️ Tech: ${VARUN.projects[3].tech}<br/>🔗 <a href="${VARUN.projects[3].url}" target="_blank">View on GitHub</a>`;
+
+    if (/vidhai|video/i.test(q))
+      return `🎥 <b>Vidhai</b><br/>${VARUN.projects[4].desc}<br/>🛠️ Tech: ${VARUN.projects[4].tech}<br/>🔗 <a href="${VARUN.projects[4].url}" target="_blank">View on GitHub</a>`;
+
+    if (/rejectrefine|reject refine|data refine/i.test(q))
+      return `🔄 <b>RejectRefine</b><br/>${VARUN.projects[5].desc}<br/>🛠️ Tech: ${VARUN.projects[5].tech}<br/>🔗 <a href="${VARUN.projects[5].url}" target="_blank">View on GitHub</a>`;
+
+    if (/supervity|ai supervision/i.test(q))
+      return `🤖 <b>Supervity AI</b><br/>${VARUN.projects[6].desc}<br/>🛠️ Tech: ${VARUN.projects[6].tech}<br/>🔗 <a href="${VARUN.projects[6].url}" target="_blank">View on GitHub</a>`;
+
+    if (/resume|cv/i.test(q))
+      return `📄 <b>Resume</b><br/>${VARUN.projects[7].desc}<br/>🛠️ Tech: ${VARUN.projects[7].tech}<br/>🔗 <a href="${VARUN.projects[7].url}" target="_blank">View on GitHub</a>`;
+
+    // LinkedIn
+    if (/linkedin|social|contact/i.test(q))
+      return `🔗 <b>Connect with Penjendru Varun!</b><br/><br/>
+        💼 <b>LinkedIn:</b> <a href="${VARUN.linkedin}" target="_blank">linkedin.com/in/penjendruvarun</a><br/>
+        🐙 <b>GitHub:</b> <a href="${VARUN.github}" target="_blank">github.com/penjendru01varun</a><br/>
+        📧 <b>Email:</b> penjendru01varun@gmail.com`;
+
+    // Skills
+    if (/skills|tech stack|technologies|programming|languages/i.test(q))
+      return `🛠️ <b>Penjendru Varun's Tech Stack:</b><br/><br/>
+        ⚡ <b>Languages:</b> JavaScript, TypeScript, Python, HTML, CSS<br/>
+        🎨 <b>Frontend:</b> React, Next.js, Tailwind CSS, Vite<br/>
+        🔧 <b>Backend:</b> Node.js, FastAPI, Django, Express<br/>
+        🗄️ <b>Databases:</b> MongoDB, PostgreSQL, Redis, Firebase<br/>
+        🚀 <b>DevOps:</b> Docker, Kubernetes, AWS, Vercel, GitHub Actions`;
+
+    // College
+    if (/college|university|rmkcet|institution|study|studying/i.test(q))
+      return `🏫 <b>Penjendru Varun</b> is studying at <b>RMKCET</b><br/>(R.M.K College of Engineering and Technology)<br/><br/>📚 Degree: <b>B.E Computer Science & Engineering</b><br/>📅 Year: <b>Pre-Final Year (3rd Year)</b>`;
+
+    // Thanks
+    if (/thank|thanks|ty|appreciate/i.test(q))
+      return "You're welcome! 😊✨ Always happy to help! Is there anything else you'd like to know about <b>Penjendru Varun</b>? 🚀";
+
+    // Default — irrelevant
+    return "I'm not supposed to answer such questions 😅<br/><br/>But I'm happy to tell you about:<br/>• 👤 <b>Penjendru Varun's</b> personal details<br/>• 💼 His <b>projects</b> and <b>repos</b><br/>• 🛠️ His <b>tech stack</b><br/>• 📊 His <b>GitHub stats</b><br/>• 🔗 His <b>social links</b><br/><br/>Just ask! 😊";
+  }
+
+  // ─────────────────────────────────────────────
+  //  UI LOGIC
+  // ─────────────────────────────────────────────
+  let chatOpen = false;
+  let firstOpen = true;
+
+  function toggleChat() {
+    chatOpen = !chatOpen;
+    const win = document.getElementById('chatWindow');
+    const dot = document.querySelector('.notif-dot');
+    if (chatOpen) {
+      win.classList.add('open');
+      dot.style.display = 'none';
+      if (firstOpen) {
+        firstOpen = false;
+        setTimeout(() => addBotMessage("Hi there! 👋✨ I'm <b>Chitti</b>, the AI assistant developed by <b>Penjendru Varun</b>!<br/><br/>I can tell you about:<br/>• 👤 His personal details<br/>• 💼 His projects (22 repos!)<br/>• 🛠️ His tech stack<br/>• 🔗 His social links<br/><br/>What would you like to know? 😊"), 400);
+      }
+    } else {
+      win.classList.remove('open');
+    }
+  }
+
+  function addBotMessage(html) {
+    const msgs = document.getElementById('messages');
+    // Typing indicator
+    const typing = document.createElement('div');
+    typing.className = 'typing';
+    typing.innerHTML = '<span></span><span></span><span></span>';
+    msgs.appendChild(typing);
+    msgs.scrollTop = msgs.scrollHeight;
+
+    setTimeout(() => {
+      typing.remove();
+      const row = document.createElement('div');
+      row.className = 'msg-row';
+      row.innerHTML = `
+        <img class="msg-avatar" src="https://user-images.githubusercontent.com/74038190/221352989-518609ab-b4d1-459e-929f-a08cd2bd9b3c.gif" alt="Chitti" />
+        <div class="msg bot">${html}</div>`;
+      msgs.appendChild(row);
+      msgs.scrollTop = msgs.scrollHeight;
+    }, 800);
+  }
+
+  function addUserMessage(text) {
+    const msgs = document.getElementById('messages');
+    const row = document.createElement('div');
+    row.className = 'msg-row user';
+    row.innerHTML = `<div class="msg user">${text}</div>`;
+    msgs.appendChild(row);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('msgInput');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    addUserMessage(text);
+    const reply = getResponse(text);
+    addBotMessage(reply);
+  }
+
+  function sendSuggestion(text) {
+    addUserMessage(text);
+    const reply = getResponse(text);
+    addBotMessage(reply);
+  }
+</script>
+</body>
+</html>
