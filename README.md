@@ -239,20 +239,18 @@ fun_fact: "I turn caffeine into code ☕→💻"
 <br/>
 
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
-<!-- 🐍 CONTRIBUTION SNAKE ANIMATION                               -->
+<!-- 🐍 CONTRIBUTION SNAKE ANIMATION (miccy/snake-evolution)       -->
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 
 <div align="center">
 
-## 🐍 Contribution Snake
+## 🐍 Neon Snake Eating My Contributions!
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/penjendru01varun/penjendru01varun/output/github-contribution-grid-snake-dark.svg" />
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/penjendru01varun/penjendru01varun/output/github-contribution-grid-snake.svg" />
-  <img alt="🐍 GitHub contribution snake animation" src="https://raw.githubusercontent.com/penjendru01varun/penjendru01varun/output/github-contribution-grid-snake-dark.svg" />
+  <img alt="🐍 Neon gamer snake eating contribution grid" src="https://raw.githubusercontent.com/penjendru01varun/penjendru01varun/output/github-contribution-grid-snake-dark.svg" width="100%" />
 </picture>
-
-> ⚡ *[Setup instructions below](#-snake-animation-setup)*
 
 </div>
 
