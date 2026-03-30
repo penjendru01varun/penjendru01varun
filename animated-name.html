@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Header</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #0D1117; /* Dark background like GitHub */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  /* Container for the banner */
+  .banner-container {
+    width: 800px;
+    height: 200px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Animated pink gradient background */
+    background: linear-gradient(45deg, #ff00ff, #ff69b4, #da70d6, #8a2be2, #00ffff);
+    background-size: 300% 300%;
+    animation: gradientShift 6s ease infinite;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(255, 0, 255, 0.3);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Keyframes for the gradient background animation */
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* The Text Style */
+  .name-text {
+    font-size: 3rem;
+    font-weight: bold;
+    color: white; /* Default color */
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    transition: color 0.4s ease, transform 0.4s ease; /* Smooth transition for hover */
+    z-index: 2;
+  }
+
+  /* Hover effect for the text */
+  .banner-container:hover .name-text {
+    color: black;
+    transform: scale(1.05); /* Slight zoom effect on hover */
+  }
+
+  /* Decorative Sparkles */
+  .sparkle {
+    position: absolute;
+    font-size: 2rem;
+    animation: twinkle 2s infinite alternate;
+  }
+  .sparkle-left { left: 15%; animation-delay: 0s; }
+  .sparkle-right { right: 15%; animation-delay: 1s; }
+
+  @keyframes twinkle {
+    0% { opacity: 0.5; transform: scale(0.8) rotate(0deg); }
+    100% { opacity: 1; transform: scale(1.2) rotate(20deg); }
+  }
+</style>
+</head>
+<body>
+
+  <!-- The Animated Banner -->
+  <div class="banner-container">
+    <div class="sparkle sparkle-left">✨</div>
+    <div class="name-text">PENJENDRU VARUN</div>
+    <div class="sparkle sparkle-right">✨</div>
+  </div>
+
+</body>
+</html>
