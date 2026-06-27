@@ -5,6 +5,15 @@ on:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
+# ⭐ CRITICAL: Add write permissions
+permissions:
+  contents: write
+  actions: write
+
+# ⭐ CRITICAL: Bypass Node 20 deprecation
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
 jobs:
   generate:
     runs-on: ubuntu-latest
